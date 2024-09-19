@@ -67,7 +67,7 @@ class ResyClient(resyApi: ResyApi) extends Logging {
         atMost    = 5 seconds
       )
 
-      logger.debug(s"URL Response: $response")
+      logger.info(s"URL Response: $response")
 
       val resDetails = Json.parse(response)
 
@@ -116,7 +116,7 @@ class ResyClient(resyApi: ResyApi) extends Logging {
         atMost    = 10 seconds
       )
 
-      logger.debug(s"URL Response: $response")
+      logger.info(s"URL Response: $response")
 
       // Searching this JSON structure...
       // {"resy_token": "RESY_TOKEN", ...}
@@ -154,8 +154,9 @@ class ResyClient(resyApi: ResyApi) extends Logging {
         awaitable = resyApi.getReservations(date, partySize, venueId),
         atMost    = 5 seconds
       )
-
-      logger.debug(s"URL Response: $response")
+        // Log the response from the API
+      logger.info(s"Received response from Resy API for findReservations: $response")
+      logger.info(s"URL Response: $response")
 
       // Searching this JSON list structure...
       // {"results": {"venues": [{"slots": [{...}, {...}]}]}}
@@ -171,7 +172,9 @@ class ResyClient(resyApi: ResyApi) extends Logging {
       case Success(reservationMap) if reservationMap.nonEmpty =>
         findReservationTime(reservationMap, resTimeTypes)
       case _ if millisToRetry > DateTime.now.getMillis - dateTimeStart =>
-        retryFindReservations(date, partySize, venueId, resTimeTypes, millisToRetry, dateTimeStart)
+        logger.info(s"No available reservations yet. Retrying in 30 seconds...")
+        Thread.sleep(30000) // Delay for 30 seconds
+      retryFindReservations(date, partySize, venueId, resTimeTypes, millisToRetry, dateTimeStart)
       case _ =>
         logger.info("Missed the shot!")
         logger.info("""┻━┻ ︵ \(°□°)/ ︵ ┻━┻""")
