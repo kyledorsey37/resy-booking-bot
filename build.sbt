@@ -1,16 +1,19 @@
 name := "resy-booking-bot"
 
-scalaVersion := "2.13.8"
+scalaVersion := "2.12.16"
 
 ThisBuild / scalafixDependencies ++= Seq(
   "com.github.vovapolu" %% "scaluzzi"         % "0.1.23",
   "org.scalatest"       %% "autofix"          % "3.1.0.1",
-  "com.eed3si9n.fix"    %% "scalafix-noinfer" % "0.1.0-M1"
+  "com.eed3si9n.fix"    %% "scalafix-noinfer" % "0.1.0-M1",
+  "org.apache.logging.log4j" % "log4j-api" % "2.14.1",
+  "org.apache.logging.log4j" % "log4j-core" % "2.14.1",
+  "org.apache.logging.log4j" %% "log4j-api-scala" % "12.0"
 )
 
 val root = Project("resy-booking-bot", file("."))
   .settings(
-    semanticdbEnabled := true,
+    //semanticdbEnabled := true,
     scalacOptions += "-Ywarn-unused",
     libraryDependencies ++= Seq(
       "com.typesafe.play"        %% "play-ahc-ws"     % "2.8.18",
