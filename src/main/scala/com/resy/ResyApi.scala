@@ -85,7 +85,7 @@ object ResyApi extends Logging {
     val url =
       s"https://$baseUrl?${stringifyQueryParams(queryParams)}"
 
-    logger.debug(s"URL Request: $url")
+    logger.info(s"URL Request: $url")
 
     ws.url(url)
       .withHttpHeaders(createHeaders(resyKeys): _*)
@@ -108,8 +108,8 @@ object ResyApi extends Logging {
       .withHttpHeaders(
         createHeaders(resyKeys) ++ Seq(
           "Content-Type" -> "application/x-www-form-urlencoded",
-          "Origin"       -> "https://widgets.resy.com",
-          "Referer"      -> "https://widgets.resy.com/"
+          "Origin"       -> "https://resy.com",
+          "Referer"      -> "https://resy.com"
         ): _*
       )
       .post(post)
@@ -117,11 +117,28 @@ object ResyApi extends Logging {
   }
 
   private[this] def createHeaders(resyKeys: ResyKeys): Seq[(String, String)] = {
-    Seq(
-      "Authorization"     -> s"""ResyAPI api_key="${resyKeys.apiKey}"""",
-      "x-resy-auth-token" -> resyKeys.authToken
-    )
-  }
+  // Log the values of apiKey and authToken
+  logger.info(s"Creating headers with API Key: ${resyKeys.apiKey} and Auth Token: ${resyKeys.authToken}")
+
+  Seq(
+    "authorization"     -> s"""ResyAPI api_key="${resyKeys.apiKey}"""",
+    "x-resy-auth-token" -> resyKeys.authToken,
+    "accept"            -> "application/json, text/plain, */*",
+    "accept-language"   -> "en-US,en;q=0.9",
+    "cache-control"     -> "no-cache",
+    "origin"            -> "https://resy.com",
+    "priority"          -> "u=1, i",
+    "referer"           -> "https://resy.com/",
+    "sec-ch-ua"         -> """"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"""",
+    "sec-ch-ua-mobile"  -> "?0",
+    "sec-ch-ua-platform" -> "macOS",
+    "sec-fetch-dest"    -> "empty",
+    "sec-fetch-mode"    -> "cors",
+    "sec-fetch-site"    -> "same-site",
+    "user-agent"        -> "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    "x-origin"          -> "https://resy.com"
+  )
+}
 
   private[this] def stringifyQueryParams(queryParams: Map[String, String]): String = {
     queryParams.foldLeft("") { case (acc, (key, value)) =>
